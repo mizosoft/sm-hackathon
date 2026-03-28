@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>The Haunted House</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+
+  <!-- Global ambient particles -->
+  <canvas id="particles" class="particles-canvas"></canvas>
+
+  <!-- ═══ Name Entry ═══ -->
+  <div id="screen-name" class="screen active">
+    <div class="container vcenter">
+      <div class="title-block">
+        <div class="ghost-bob">👻</div>
+        <h1 class="game-title">The Haunted House</h1>
+        <p class="tagline">A Multiplayer Social Deduction Game</p>
+      </div>
+      <div class="glass-card">
+        <input type="text" id="input-name" placeholder="Enter your name..." maxlength="20" autocomplete="off" class="gi">
+        <button id="btn-name-ok" class="gb primary">Enter the House</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Room Browser ═══ -->
+  <div id="screen-rooms" class="screen">
+    <div class="container">
+      <div class="row-between">
+        <h2 class="sec-title">Lobbies</h2>
+        <span class="badge" id="rooms-player-name"></span>
+      </div>
+
+      <div class="glass-card">
+        <button id="btn-create-room" class="gb accent glow">+ Create New Room</button>
+      </div>
+
+      <div class="glass-card">
+        <label class="label">Join by Code</label>
+        <div class="input-row">
+          <input type="text" id="input-room-code" placeholder="ABCD" maxlength="4" autocomplete="off" class="gi code-input">
+          <button id="btn-join-code" class="gb primary compact">Join</button>
+        </div>
+      </div>
+
+      <div id="rooms-list" class="rooms-list">
+        <p class="dim center" id="rooms-empty-msg">No rooms yet — create one!</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══ Game Lobby ═══ -->
+  <div id="screen-lobby" class="screen">
+    <div class="container vcenter">
+      <div class="code-hero">
+        <span class="code-label">Room Code</span>
+        <span id="lobby-code" class="code-big"></span>
+      </div>
+      <div class="glass-card">
+        <h3>Players <span id="player-count" class="dim"></span></h3>
+        <ul id="player-list" class="plist"></ul>
+        <p id="lobby-msg" class="status-msg"></p>
+        <button id="btn-start" class="gb accent glow hidden">Start Game</button>
+      </div>
+      <button id="btn-leave-room" class="gb outline">Leave Room</button>
+    </div>
+  </div>
+
+  <!-- ═══ Role Reveal ═══ -->
+  <div id="screen-role" class="screen">
+    <div class="container vcenter">
+      <div id="role-card" class="role-card glass-card">
+        <div id="role-icon" class="role-icon"></div>
+        <h2 id="role-title" class="role-title"></h2>
+        <div id="role-body"></div>
+      </div>
+      <button id="btn-role-ok" class="gb primary">I'm Ready</button>
+      <p class="wait-text" id="role-wait"></p>
+    </div>
+  </div>
+
+  <!-- ═══ Main Game Screen ═══ -->
+  <div id="screen-game" class="screen game-screen">
+    <!-- HUD -->
+    <div id="game-hud" class="hud"></div>
+
+    <!-- 2D Map -->
+    <div id="map-viewport" class="map-viewport">
+      <svg id="map-svg" class="map-svg" preserveAspectRatio="none"></svg>
+      <div id="map-nodes" class="map-nodes"></div>
+    </div>
+
+    <!-- Bottom panel -->
+    <div class="game-panel">
+      <div class="tab-bar">
+        <button class="tab active" data-tab="actions" onclick="switchTab('actions')">⚔️ Actions</button>
+        <button class="tab" data-tab="clues" onclick="switchTab('clues')">🔍 Clues</button>
+        <button class="tab" data-tab="log" onclick="switchTab('log')">📜 Log</button>
+      </div>
+      <div id="tab-actions" class="tab-pane active"></div>
+      <div id="tab-clues" class="tab-pane"></div>
+      <div id="tab-log" class="tab-pane"></div>
+    </div>
+  </div>
+
+  <!-- ═══ Results ═══ -->
+  <div id="screen-results" class="screen">
+    <div class="container">
+      <h2 class="sec-title">Round Summary</h2>
+      <div id="results-events" class="glass-card"></div>
+      <div id="results-private" class="glass-card hidden"></div>
+      <div id="results-progress" class="progress-wrap"></div>
+      <button id="btn-results-ok" class="gb primary">Continue</button>
+      <p class="wait-text" id="results-wait"></p>
+    </div>
+  </div>
+
+  <!-- ═══ Meeting ═══ -->
+  <div id="screen-meeting" class="screen">
+    <div class="container vcenter">
+      <div class="meeting-banner">
+        <span class="meeting-icon pulse">🔔</span>
+        <h2>Emergency Meeting</h2>
+      </div>
+      <div id="meeting-body" class="glass-card"></div>
+      <div class="glass-card tip-card">
+        <strong>💡 TIP:</strong> Discuss with the other players!
+        Share what you saw, where you were, and any clues you found.
+      </div>
+      <button id="btn-meeting-ok" class="gb primary">Ready to Vote</button>
+      <p class="wait-text" id="meeting-wait"></p>
+    </div>
+  </div>
+
+  <!-- ═══ Vote ═══ -->
+  <div id="screen-vote" class="screen">
+    <div class="container vcenter">
+      <h2 class="sec-title">Cast Your Vote</h2>
+      <p class="dim center" style="margin-bottom:1rem">Who do you think is possessed?</p>
+      <div id="vote-options" class="vote-grid"></div>
+    </div>
+  </div>
+
+  <!-- ═══ Vote Results ═══ -->
+  <div id="screen-vote-results" class="screen">
+    <div class="container vcenter">
+      <h2 class="sec-title">Vote Results</h2>
+      <div id="vote-results-body" class="glass-card"></div>
+      <button id="btn-vote-results-ok" class="gb primary">Continue</button>
+      <p class="wait-text" id="vote-results-wait"></p>
+    </div>
+  </div>
+
+  <!-- ═══ Game Over ═══ -->
+  <div id="screen-end" class="screen">
+    <div class="container vcenter">
+      <div id="end-icon" class="end-icon"></div>
+      <h2 id="end-title" class="end-title"></h2>
+      <p id="end-subtitle" class="tagline"></p>
+      <div id="end-body" class="glass-card"></div>
+      <div id="end-stats" class="glass-card"></div>
+      <button id="btn-restart" class="gb accent glow">Play Again</button>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
